@@ -5,15 +5,14 @@ import torch
 
 ex = Experiment()
 
-def initialization(config, seed, logname_postfix):
-    cfg = edict(config)
-    utils.random_init(seed)
-
+def initialization(config, seed, mode):
     # Add it if your input size is fixed 
     # ref: https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
     torch.backends.cudnn.benchmark = True 
     
-    logger = utils.create_logger(cfg, postfix=logname_postfix)
+    cfg = edict(config)
+    utils.random_init(seed)
+    logger = utils.make_logger(f'{cfg.exp.name}_{mode}', savedir=cfg.exp.savedir)
     
     return cfg, logger
 
