@@ -1,5 +1,27 @@
 
 
+def get_params(model, prefixs, suffixes, exclude=None):
+    """
+    This generator returns all the parameters of the net except for
+    the last classification layer. Note that for each batchnorm layer,
+    requires_grad is set to False in deeplab_resnet.py, therefore this function does not return
+    any batchnorm parameter
+    """
+    for name, module in model.named_modules():
+        for prefix in prefixs:
+            if name == prefix:
+                for n, p in module.named_parameters():
+                    n = '.'.join([name, n])
+                    if type(exclude) == list and n in exclude:
+                        continue
+                    if type(exclude) == str and exclude in n:
+                        continue
+
+                    for suffix in suffixes:
+                        if (n.split('.')[-1].startswith(suffix) or n.endswith(suffix)) and p.requires_grad:
+                            yield p
+                break
+
 
 def create_logger(cfg, postfix=''):
     """Set up the logger for saving log file on the disk
